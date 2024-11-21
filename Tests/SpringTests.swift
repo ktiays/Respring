@@ -146,9 +146,103 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
 
 @available(iOS 17.0, macOS 14.0, *)
 @Test func settlingDurationDampingRatio() {
+    
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func vectorArithmetic() {
     with {
-//        let spring = SwiftUI.Spring(settlingDuration: 0.4, dampingRatio: 0.8)
-//        let respring = Respring.Spring(settlingDuration: 0.4, dampingRatio: 0.8)
-//        #expect(respring == spring)
+        let spring = SwiftUI.Spring()
+        let respring = Respring.Spring()
+        
+        let springValue = spring.value(target: 1.2, time: 0.2)
+        let respringValue = respring.value(target: 1.2, time: 0.2)
+        #expect(springValue == respringValue)
+        
+        let springForce = spring.force(target: 0.2, position: 1, velocity: -0.2)
+        let respringForce = respring.force(target: 0.2, position: 1, velocity: -0.2)
+        #expect(springForce == respringForce)
+        
+        let springVelocity = spring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        #expect(springVelocity == respringVelocity)
+        
+        with {
+            var springValue: Double = 0
+            var springVelocity: Double = 0
+            var respringValue: Double = 0
+            var respringVelocity: Double = 0
+            spring.update(value: &springValue, velocity: &springVelocity, target: 1.2, deltaTime: 0.16)
+            respring.update(value: &respringValue, velocity: &respringVelocity, target: 1.2, deltaTime: 0.16)
+            #expect(springValue == respringValue)
+            
+            spring.update(value: &springValue, velocity: &springVelocity, target: 1.2, deltaTime: 0.16)
+            respring.update(value: &respringValue, velocity: &respringVelocity, target: 1.2, deltaTime: 0.16)
+            #expect(springValue == respringValue)
+            
+            spring.update(value: &springValue, velocity: &springVelocity, target: 1.2, deltaTime: 0.16)
+            respring.update(value: &respringValue, velocity: &respringVelocity, target: 1.2, deltaTime: 0.16)
+            #expect(springValue == respringValue)
+            
+            spring.update(value: &springValue, velocity: &springVelocity, target: 1.2, deltaTime: 1)
+            respring.update(value: &respringValue, velocity: &respringVelocity, target: 1.2, deltaTime: 1)
+            #expect(springValue == respringValue)
+        }
+    }
+    with {
+        let spring = SwiftUI.Spring(duration: 0.7, bounce: 0.2)
+        let respring = Respring.Spring(duration: 0.7, bounce: 0.2)
+        
+        let springValue = spring.value(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        let respringValue = respring.value(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        #expect(springValue == respringValue)
+        
+        let springForce = spring.force(target: 1.2, position: 0.1, velocity: 0.2)
+        let respringForce = respring.force(target: 1.2, position: 0.1, velocity: 0.2)
+        #expect(springForce == respringForce)
+        
+        let springVelocity = spring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        #expect(springVelocity == respringVelocity)
+    }
+    with {
+        let spring = SwiftUI.Spring()
+        let respring = Respring.Spring()
+        
+        let springValue = spring.value(target: 1.2, time: 0.2)
+        let respringValue = respring.value(target: 1.2, time: 0.2)
+        #expect(springValue == respringValue)
+        
+        let springForce = spring.force(target: 1, position: 0.3, velocity: 0)
+        let respringForce = respring.force(target: 1, position: 0.3, velocity: 0)
+        #expect(springForce == respringForce)
+    }
+    with {
+        let spring = SwiftUI.Spring(duration: 0.7, bounce: -0.2)
+        let respring = Respring.Spring(duration: 0.7, bounce: -0.2)
+        
+        let springValue = spring.value(target: 1.2, time: 0.2)
+        let respringValue = respring.value(target: 1.2, time: 0.2)
+        #expect(springValue == respringValue)
+        
+        let springForce = spring.force(target: 0.2, position: 1, velocity: -0.2)
+        let respringForce = respring.force(target: 0.2, position: 1, velocity: -0.2)
+        #expect(springForce == respringForce)
+        
+        let springVelocity = spring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
+        #expect(springVelocity == respringVelocity)
+    }
+    with {
+        let spring = SwiftUI.Spring(mass: 0.6, stiffness: 0.1, damping: 10, allowOverDamping: true)
+        let respring = Respring.Spring(mass: 0.6, stiffness: 0.1, damping: 10, allowOverDamping: true)
+        
+        let springValue = spring.value(target: 2, time: 0.3)
+        let respringValue = respring.value(target: 2, time: 0.3)
+        #expect(springValue == respringValue)
+        
+        let springForce = spring.force(target: 0.2, position: 1, velocity: -0.2)
+        let respringForce = respring.force(target: 0.2, position: 1, velocity: -0.2)
+        #expect(springForce == respringForce)
     }
 }

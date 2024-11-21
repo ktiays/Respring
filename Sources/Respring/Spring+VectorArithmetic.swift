@@ -9,12 +9,63 @@ extension Spring {
 
     /// Calculates the value of the spring at a given time given a target amount of change.
     public func value<V>(target: V, initialVelocity: V = .zero, time: TimeInterval) -> V where V: VectorArithmetic {
-        fatalError()
+        if angularFrequency > 0 {
+            let sincos = __sincos_stret(angularFrequency * time)
+            let sinval = sincos.__sinval
+            let cosval = sincos.__cosval
+
+            let displacement = (target.scaled(by: decayConstant) - initialVelocity).scaled(by: sinval / angularFrequency) + target.scaled(by: cosval)
+            return target - displacement.scaled(by: exp(-decayConstant * time))
+        } else if angularFrequency < 0 {
+            let negativeFreqMinusDamping = -angularFrequency - decayConstant
+            let expTerm1 = exp(negativeFreqMinusDamping * time)
+            let expTerm2 = exp((angularFrequency - decayConstant) * time)
+
+            let dampingFactor = (decayConstant - angularFrequency) * expTerm1 + negativeFreqMinusDamping * expTerm2
+            let scaleFactor = dampingFactor / (angularFrequency * 2) + 1
+            let velocityFactor = (expTerm1 - expTerm2) / (angularFrequency * 2)
+
+            return target.scaled(by: scaleFactor) - initialVelocity.scaled(by: velocityFactor)
+        } else {
+            let displacement = target + (target.scaled(by: decayConstant) - initialVelocity).scaled(by: time)
+            let dampingTerm = exp(-decayConstant * time)
+            return target - displacement.scaled(by: dampingTerm)
+        }
     }
 
     /// Calculates the velocity of the spring at a given time given a target amount of change.
     public func velocity<V>(target: V, initialVelocity: V = .zero, time: TimeInterval) -> V where V: VectorArithmetic {
-        fatalError()
+        if angularFrequency > 0 {
+            let dampingTerm = exp(-decayConstant * time)
+            let sincos = __sincos_stret(angularFrequency * time)
+            let sinval = sincos.__sinval
+            let cosval = sincos.__cosval
+
+            let targetTerm = target.scaled(by: (angularFrequency * sinval + decayConstant * cosval) * dampingTerm)
+            let displacementFactor = (decayConstant * sinval - angularFrequency * cosval) * dampingTerm / angularFrequency
+            let velocityTerm = (target.scaled(by: decayConstant) - initialVelocity).scaled(by: displacementFactor)
+            return velocityTerm + targetTerm
+        } else if angularFrequency < 0 {
+            let negativeFreqMinusDamping = -angularFrequency - decayConstant
+            let dampingMinusFreq = angularFrequency - decayConstant
+
+            let expTerm1 = exp(negativeFreqMinusDamping * time)
+            let expTerm2 = exp(dampingMinusFreq * time)
+
+            let term1 = negativeFreqMinusDamping * expTerm1
+            let term2 = dampingMinusFreq * expTerm2
+
+            let scaleFactor = ((decayConstant - angularFrequency) * term1 + negativeFreqMinusDamping * term2) / (angularFrequency * 2) + 1
+            let velocityFactor = (term1 - term2) / (angularFrequency * 2)
+
+            return target.scaled(by: scaleFactor) - initialVelocity.scaled(by: velocityFactor)
+        } else {
+            let dampingTerm = exp(-decayConstant * time)
+            let timeFactor = (decayConstant * time - 1) * dampingTerm
+            let velocityDelta = target.scaled(by: decayConstant) - initialVelocity
+            let dampedTarget = target.scaled(by: decayConstant * dampingTerm)
+            return velocityDelta.scaled(by: timeFactor) + dampedTarget
+        }
     }
 
     /// Updates the current  value and velocity of a spring.
@@ -26,13 +77,20 @@ extension Spring {
     ///   - deltaTime: The amount of time that has passed since the spring was
     ///     at the position specified by `value`.
     public func update<V>(value: inout V, velocity: inout V, target: V, deltaTime: TimeInterval) where V: VectorArithmetic {
-        fatalError()
+        let delta = target - value
+        let deltaVelocity = self.velocity(target: delta, initialVelocity: velocity, time: deltaTime)
+        let deltaValue = self.value(target: delta, initialVelocity: velocity, time: deltaTime)
+        velocity = deltaVelocity
+        value += deltaValue
     }
 
     /// Calculates the force upon the spring given a current position, target, and velocity amount of change.
     ///
     /// This value is in units of the vector type per second squared.
     public func force<V>(target: V, position: V, velocity: V) -> V where V: VectorArithmetic {
-        fatalError()
+        let dampingForce = velocity.scaled(by: (-decayConstant * 2) * _mass)
+        let delta = target - position
+        let springForce = delta.scaled(by: (angularFrequency * angularFrequency + decayConstant * decayConstant) * _mass)
+        return springForce + dampingForce
     }
 }
