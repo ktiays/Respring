@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "EF6FB915-6295-4153-BB09-525F9426DB5F",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "RespringTests",
+        "name" : "RespringTests"
+      }
+    }
+  ],
+  "version" : 1
+}
