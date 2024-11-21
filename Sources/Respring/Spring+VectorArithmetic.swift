@@ -6,6 +6,23 @@
 import Foundation
 
 extension Spring {
+    
+    /// The estimated duration required for the spring system to be considered
+    /// at rest.
+    ///
+    /// This uses a `target` of 1.0, an `initialVelocity` of 0, and an `epsilon`
+    /// of 0.001.
+    public var settlingDuration: TimeInterval {
+        self.settlingDuration(target: 1.0, initialVelocity: 0, epsilon: 0.001)
+    }
+    
+    /// The estimated duration required for the spring system to be considered at rest.
+    ///
+    /// The epsilon value specifies the threshhold for how small all subsequent
+    /// values need to be before the spring is considered to have settled.
+    public func settlingDuration<V>(target: V, initialVelocity: V = .zero, epsilon: Double) -> TimeInterval where V: VectorArithmetic {
+        fatalError()
+    }
 
     /// Calculates the value of the spring at a given time given a target amount of change.
     public func value<V>(target: V, initialVelocity: V = .zero, time: TimeInterval) -> V where V: VectorArithmetic {

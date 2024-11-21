@@ -167,6 +167,11 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
         #expect(springVelocity == respringVelocity)
         
+        SwiftUI.Spring.snappy
+        let springSettlingDuration = spring.settlingDuration(target: 1, epsilon: 0.001)
+//        let respringSettlingDuration = respring.settlingDuration
+//        #expect(springSettlingDuration == respringSettlingDuration)
+        
         with {
             var springValue: Double = 0
             var springVelocity: Double = 0
