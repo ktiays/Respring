@@ -13,26 +13,44 @@ func with(_ body: () -> Void) {
     body()
 }
 
-@available(iOS 17.0, macOS 14.0, *)
-func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
-    var angularFrequency: Double = 0
-    var decayConstant: Double = 0
-    var mass: Double = 0
-    for child in Mirror(reflecting: rhs).children {
-        if let label = child.label {
-            switch label {
-            case "angularFrequency":
-                angularFrequency = child.value as! Double
-            case "decayConstant":
-                decayConstant = child.value as! Double
-            case "_mass":
-                mass = child.value as! Double
-            default:
-                break
+public struct SpringRepresentation: Equatable, CustomStringConvertible {
+    public var angularFrequency: Double = 0
+    public var decayConstant: Double = 0
+    public var mass: Double = 1
+    
+    public var description: String {
+        "Spring(angularFrequency: \(angularFrequency), decayConstant: \(decayConstant), mass: \(mass))"
+    }
+    
+    @available(iOS 17.0, macOS 14.0, *)
+    public init(_ spring: SwiftUI.Spring) {
+        Mirror(reflecting: spring).children.forEach { child in
+            if let label = child.label {
+                switch label {
+                case "angularFrequency":
+                    angularFrequency = child.value as! Double
+                case "decayConstant":
+                    decayConstant = child.value as! Double
+                case "_mass":
+                    mass = child.value as! Double
+                default:
+                    break
+                }
             }
         }
     }
-    return lhs == Respring.Spring(angularFrequency: angularFrequency, decayConstant: decayConstant, mass: mass)
+    
+    public init(_ spring: Respring.Spring) {
+        angularFrequency = spring.angularFrequency
+        decayConstant = spring.decayConstant
+        mass = spring._mass
+    }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@inlinable
+func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
+    SpringRepresentation(lhs) == SpringRepresentation(rhs)
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -167,10 +185,9 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
         #expect(springVelocity == respringVelocity)
         
-        SwiftUI.Spring.snappy
-        let springSettlingDuration = spring.settlingDuration(target: 1, epsilon: 0.001)
-//        let respringSettlingDuration = respring.settlingDuration
-//        #expect(springSettlingDuration == respringSettlingDuration)
+        let springSettlingDuration = spring.settlingDuration
+        let respringSettlingDuration = respring.settlingDuration
+        #expect(springSettlingDuration == respringSettlingDuration)
         
         with {
             var springValue: Double = 0
@@ -209,6 +226,10 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let springVelocity = spring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
         let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
         #expect(springVelocity == respringVelocity)
+        
+        let springSettlingDuration = spring.settlingDuration(target: 1.2, initialVelocity: 0.1, epsilon: 0.001)
+        let respringSettlingDuration = respring.settlingDuration(target: 1.2, initialVelocity: 0.1, epsilon: 0.001)
+        #expect(springSettlingDuration == respringSettlingDuration)
     }
     with {
         let spring = SwiftUI.Spring()
@@ -221,6 +242,10 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let springForce = spring.force(target: 1, position: 0.3, velocity: 0)
         let respringForce = respring.force(target: 1, position: 0.3, velocity: 0)
         #expect(springForce == respringForce)
+        
+        let springSettlingDuration = spring.settlingDuration(target: 10, initialVelocity: 1, epsilon: 0.01)
+        let respringSettlingDuration = respring.settlingDuration(target: 10, initialVelocity: 1, epsilon: 0.01)
+        #expect(springSettlingDuration == respringSettlingDuration)
     }
     with {
         let spring = SwiftUI.Spring(duration: 0.7, bounce: -0.2)
@@ -237,6 +262,12 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let springVelocity = spring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
         let respringVelocity = respring.velocity(target: 1.2, initialVelocity: 0.1, time: 0.2)
         #expect(springVelocity == respringVelocity)
+        
+        #expect(spring.settlingDuration == respring.settlingDuration)
+        
+        let springSettlingDuration = spring.settlingDuration(target: 10, initialVelocity: 1, epsilon: 0.01)
+        let respringSettlingDuration = respring.settlingDuration(target: 10, initialVelocity: 1, epsilon: 0.01)
+        #expect(springSettlingDuration == respringSettlingDuration)
     }
     with {
         let spring = SwiftUI.Spring(mass: 0.6, stiffness: 0.1, damping: 10, allowOverDamping: true)
@@ -249,5 +280,18 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let springForce = spring.force(target: 0.2, position: 1, velocity: -0.2)
         let respringForce = respring.force(target: 0.2, position: 1, velocity: -0.2)
         #expect(springForce == respringForce)
+        
+        #expect(spring.settlingDuration == respring.settlingDuration)
+        
+        let springSettlingDuration = spring.settlingDuration(target: 0.2, initialVelocity: 0, epsilon: 0.001)
+        let respringSettlingDuration = respring.settlingDuration(target: 0.2, initialVelocity: 0, epsilon: 0.001)
+        #expect(springSettlingDuration == respringSettlingDuration)
     }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func preset() {
+    #expect(Respring.Spring.smooth == SwiftUI.Spring.smooth)
+    #expect(Respring.Spring.snappy == SwiftUI.Spring.snappy)
+    #expect(Respring.Spring.bouncy == SwiftUI.Spring.bouncy)
 }

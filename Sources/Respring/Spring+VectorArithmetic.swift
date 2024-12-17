@@ -21,7 +21,49 @@ extension Spring {
     /// The epsilon value specifies the threshhold for how small all subsequent
     /// values need to be before the spring is considered to have settled.
     public func settlingDuration<V>(target: V, initialVelocity: V = .zero, epsilon: Double) -> TimeInterval where V: VectorArithmetic {
-        fatalError()
+        if decayConstant == 0 {
+            return .infinity
+        }
+        
+        if angularFrequency <= 0 {
+            var bestTime = -1.0
+            var time: TimeInterval = 0.0
+            var bestDistance: Double = .infinity
+            
+            for _ in 0..<1024 {
+                let currentValue = value(
+                    target: target,
+                    initialVelocity: initialVelocity,
+                    time: time
+                )
+                let diff = currentValue - target
+                let distance = sqrt(diff.magnitudeSquared)
+                if distance.isNaN || distance.isInfinite {
+                    break
+                }
+                
+                if bestDistance >= epsilon {
+                    if distance < bestDistance {
+                        bestTime = time
+                        bestDistance = distance
+                    }
+                } else {
+                    if distance >= epsilon {
+                        bestDistance = .infinity
+                    } else if time - bestTime > 1 {
+                        return bestTime
+                    }
+                }
+                
+                time += 0.1
+            }
+            
+            return 0
+        }
+        
+        let magnitude = (target.scaled(by: decayConstant) - initialVelocity).magnitudeSquared.squareRoot() + sqrt(target.magnitudeSquared)
+        let settlingTime = -log(epsilon / magnitude) / decayConstant
+        return max(0, settlingTime)
     }
 
     /// Calculates the value of the spring at a given time given a target amount of change.
