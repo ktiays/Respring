@@ -3,7 +3,7 @@
 An open-source implementation of SwiftUI's `Spring` animation.
 
 This repository aims to provide an interface and behavior identical to SwiftUI's native `Spring` implementation.
-This package allows you to use `Spring` to drive your animations without relying on SwiftUI.
+This package allows you to use `Spring` to drive your animations without depending on SwiftUI.
 
 ## Usage
 
