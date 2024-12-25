@@ -22,6 +22,10 @@ public struct SpringRepresentation: Equatable, CustomStringConvertible {
         "Spring(angularFrequency: \(angularFrequency), decayConstant: \(decayConstant), mass: \(mass))"
     }
     
+    public var isNaN: Bool {
+        angularFrequency.isNaN || decayConstant.isNaN || mass.isNaN
+    }
+    
     @available(iOS 17.0, macOS 14.0, *)
     public init(_ spring: SwiftUI.Spring) {
         Mirror(reflecting: spring).children.forEach { child in
@@ -51,6 +55,12 @@ public struct SpringRepresentation: Equatable, CustomStringConvertible {
 @inlinable
 func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
     SpringRepresentation(lhs) == SpringRepresentation(rhs)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@inlinable
+func != (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
+    !(SpringRepresentation(lhs) == SpringRepresentation(rhs))
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -164,7 +174,91 @@ func == (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
 
 @available(iOS 17.0, macOS 14.0, *)
 @Test func settlingDurationDampingRatio() {
-    
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 0.5, dampingRatio: 0.3)
+        let respring = Respring.Spring(settlingDuration: 0.5, dampingRatio: 0.3)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 0.4, dampingRatio: 0.8)
+        let respring = Respring.Spring(settlingDuration: 0.4, dampingRatio: 0.8)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 0.1, dampingRatio: 0.1)
+        let respring = Respring.Spring(settlingDuration: 0.1, dampingRatio: 0.1)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 0.456, dampingRatio: 0.321)
+        let respring = Respring.Spring(settlingDuration: 0.456, dampingRatio: 0.321)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 11, dampingRatio: 0.9)
+        let respring = Respring.Spring(settlingDuration: 11, dampingRatio: 0.9)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 2, dampingRatio: 20)
+        let respring = Respring.Spring(settlingDuration: 2, dampingRatio: 20)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 0, dampingRatio: 0)
+        let respring = Respring.Spring(settlingDuration: 0, dampingRatio: 0)
+        let springRepresentation = SpringRepresentation(spring)
+        let respringRepresentation = SpringRepresentation(respring)
+        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: .infinity, dampingRatio: .infinity)
+        let respring = Respring.Spring(settlingDuration: .infinity, dampingRatio: .infinity)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: .nan, dampingRatio: .nan)
+        let respring = Respring.Spring(settlingDuration: .nan, dampingRatio: .nan)
+        let springRepresentation = SpringRepresentation(spring)
+        let respringRepresentation = SpringRepresentation(respring)
+        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: -.infinity, dampingRatio: -.infinity)
+        let respring = Respring.Spring(settlingDuration: -.infinity, dampingRatio: -.infinity)
+        let springRepresentation = SpringRepresentation(spring)
+        let respringRepresentation = SpringRepresentation(respring)
+        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: -.infinity, dampingRatio: .infinity)
+        let respring = Respring.Spring(settlingDuration: -.infinity, dampingRatio: .infinity)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: .infinity, dampingRatio: -.infinity)
+        let respring = Respring.Spring(settlingDuration: .infinity, dampingRatio: -.infinity)
+        let springRepresentation = SpringRepresentation(spring)
+        let respringRepresentation = SpringRepresentation(respring)
+        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 0, dampingRatio: .infinity)
+        let respring = Respring.Spring(settlingDuration: 0, dampingRatio: .infinity)
+        #expect(respring == spring)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: .infinity, dampingRatio: 0)
+        let respring = Respring.Spring(settlingDuration: .infinity, dampingRatio: 0)
+        let springRepresentation = SpringRepresentation(spring)
+        let respringRepresentation = SpringRepresentation(respring)
+        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+    }
+    with {
+        let spring = SwiftUI.Spring(settlingDuration: 1e2, dampingRatio: 1e3)
+        let respring = Respring.Spring(settlingDuration: 1e2, dampingRatio: 1e3)
+        #expect(respring == spring)
+    }
 }
 
 @available(iOS 17.0, macOS 14.0, *)

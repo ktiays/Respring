@@ -59,6 +59,7 @@ extension Spring {
     ///     oscillation for the spring.
     ///   - extraBounce: How much additional bounciness should be added to the
     ///     base bounce of 0.15.
+    @inlinable
     public static func snappy(duration: TimeInterval = 0.5, extraBounce: Double = 0.0) -> Spring {
         .init(duration: duration, bounce: 0.15 + extraBounce)
     }
@@ -78,6 +79,7 @@ extension Spring {
     ///     oscillation for the spring.
     ///   - extraBounce: How much additional bounce should be added to the base
     ///     bounce of 0.3.
+    @inlinable
     public static func bouncy(duration: TimeInterval = 0.5, extraBounce: Double = 0.0) -> Spring {
         .init(duration: duration, bounce: 0.3 + extraBounce)
     }
