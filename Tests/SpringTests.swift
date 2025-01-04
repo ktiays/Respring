@@ -22,10 +22,6 @@ public struct SpringRepresentation: Equatable, CustomStringConvertible {
         "Spring(angularFrequency: \(angularFrequency), decayConstant: \(decayConstant), mass: \(mass))"
     }
     
-    public var isNaN: Bool {
-        angularFrequency.isNaN || decayConstant.isNaN || mass.isNaN
-    }
-    
     @available(iOS 17.0, macOS 14.0, *)
     public init(_ spring: SwiftUI.Spring) {
         Mirror(reflecting: spring).children.forEach { child in
@@ -209,7 +205,8 @@ func != (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let respring = Respring.Spring(settlingDuration: 0, dampingRatio: 0)
         let springRepresentation = SpringRepresentation(spring)
         let respringRepresentation = SpringRepresentation(respring)
-        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+        #expect(springRepresentation.angularFrequency.isNaN && respringRepresentation.angularFrequency.isNaN)
+        #expect(springRepresentation.decayConstant.isNaN && respringRepresentation.decayConstant.isNaN)
     }
     with {
         let spring = SwiftUI.Spring(settlingDuration: .infinity, dampingRatio: .infinity)
@@ -221,14 +218,16 @@ func != (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let respring = Respring.Spring(settlingDuration: .nan, dampingRatio: .nan)
         let springRepresentation = SpringRepresentation(spring)
         let respringRepresentation = SpringRepresentation(respring)
-        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+        #expect(springRepresentation.angularFrequency.isNaN && respringRepresentation.angularFrequency.isNaN)
+        #expect(springRepresentation.decayConstant.isNaN && respringRepresentation.decayConstant.isNaN)
     }
     with {
         let spring = SwiftUI.Spring(settlingDuration: -.infinity, dampingRatio: -.infinity)
         let respring = Respring.Spring(settlingDuration: -.infinity, dampingRatio: -.infinity)
         let springRepresentation = SpringRepresentation(spring)
         let respringRepresentation = SpringRepresentation(respring)
-        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+        #expect(springRepresentation.angularFrequency.isNaN && respringRepresentation.angularFrequency.isNaN)
+        #expect(springRepresentation.decayConstant.isNaN && respringRepresentation.decayConstant.isNaN)
     }
     with {
         let spring = SwiftUI.Spring(settlingDuration: -.infinity, dampingRatio: .infinity)
@@ -240,7 +239,8 @@ func != (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let respring = Respring.Spring(settlingDuration: .infinity, dampingRatio: -.infinity)
         let springRepresentation = SpringRepresentation(spring)
         let respringRepresentation = SpringRepresentation(respring)
-        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+        #expect(springRepresentation.angularFrequency.isNaN && respringRepresentation.angularFrequency.isNaN)
+        #expect(springRepresentation.decayConstant.isNaN && respringRepresentation.decayConstant.isNaN)
     }
     with {
         let spring = SwiftUI.Spring(settlingDuration: 0, dampingRatio: .infinity)
@@ -252,7 +252,8 @@ func != (_ lhs: Respring.Spring, _ rhs: SwiftUI.Spring) -> Bool {
         let respring = Respring.Spring(settlingDuration: .infinity, dampingRatio: 0)
         let springRepresentation = SpringRepresentation(spring)
         let respringRepresentation = SpringRepresentation(respring)
-        #expect(springRepresentation.isNaN && respringRepresentation.isNaN)
+        #expect(springRepresentation.angularFrequency.isNaN && respringRepresentation.angularFrequency.isNaN)
+        #expect(springRepresentation.decayConstant.isNaN && respringRepresentation.decayConstant.isNaN)
     }
     with {
         let spring = SwiftUI.Spring(settlingDuration: 1e2, dampingRatio: 1e3)
