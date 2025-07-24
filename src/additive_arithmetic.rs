@@ -1,8 +1,6 @@
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Sub};
 
-pub trait AdditiveArithmetic:
-    Add<Output = Self> + AddAssign + Sub<Output = Self> + SubAssign + Sized
-{
+pub trait AdditiveArithmetic: Add<Output = Self> + AddAssign + Sub<Output = Self> + Sized {
     const ZERO: Self;
 }
 
